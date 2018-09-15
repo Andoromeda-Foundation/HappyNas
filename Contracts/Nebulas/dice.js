@@ -127,7 +127,7 @@ class DiceContract extends OwnerableContract {
                 payout = new BigNumber(value).times(96).dividedToIntegerBy(99 - bet_number)
             }
         }
-        if (payout.qt(0)) {
+        if (payout.gt(0)) {
             Blockchain.transfer(from, payout)
         }
         const betInfo = { bet_number, roll_number, payout }
