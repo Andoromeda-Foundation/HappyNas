@@ -110,24 +110,31 @@ class DiceContract extends OwnerableContract {
 
     // referer by default is empty
     bet(referer = "", bet_number = 50, is_under = true) {
-        var {
+        const {
             from,
             value
         } = Blockchain.transaction
 
         this._sendCommissionTo(referer, value)
 
-        var roll_number = Math.floor(Math.random() * 100);
+        const roll_number = Math.floor(Math.random() * 100);
+        var payout = new BigNumber(0);
+
         if (is_under) {
             if (bet_number < roll_number) {
-                Blockchain.transfer(from, new BigNumber(value).times(96).dividedToIntegerBy(bet_number))
+                payout = new BigNumber(value).times(96).dividedToIntegerBy(bet_number)
             }
         } else {
             if (bet_number > roll_number) {
-                Blockchain.transfer(from, new BigNumber(value).times(96).dividedToIntegerBy(99 - bet_number))
+                payout = new BigNumber(value).times(96).dividedToIntegerBy(99 - bet_number)
             }
         }
-        this._event("Bet", { number: roll_number });
+        if (payout.qt(0)) {
+            Blockchain.transfer(from, payout)
+        }
+        const betInfo = { bet_number, roll_number, payout }
+        this._event("Bet", betInfo);
+        return betInfo
     }
 
 
