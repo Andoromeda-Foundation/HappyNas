@@ -12,10 +12,10 @@ import { LocalContractStorage, Blockchain, StorageMap } from "./System";
 
 
 const BigNumberStorageDescriptor = {
-    parse(value) {
+    parse(value: number | string | BigNumber) {
         return new BigNumber(value);
     },
-    stringify(o) {
+    stringify(o: BigNumber) {
         return o.toString(10);
     }
 }
@@ -79,7 +79,7 @@ class OwnerableContract {
         this.myAddress = to
     }
 
-    withdraw(value) {
+    withdraw(value: string | BigNumber | number) {
         // Admins can ONLY REQUEST, Owner will GOT THE MONEY ANYWAY
         this.onlyAdmins()
         // Only the owner can have the withdrawed fund, so be careful
@@ -97,22 +97,21 @@ class OwnerableContract {
     }
 }
 
+// extends will trigger `InvalidLHSInAssignment` Invalid left-hand side in assignment
 class DiceContract extends OwnerableContract {
     referCut: BigNumber
     constructor() {
         super()
+        // So we can take `referCut` as BigNumber object already (No more string to BN conversion now)
         LocalContractStorage.defineProperties(this, {
-            // So we can take `referCut` as BigNumber object already (No more string to BN conversion now)
             referCut: BigNumberStorageDescriptor,
         })
         LocalContractStorage.defineMapProperties(this, {
         })
     }
 
-    _sendCommissionTo(referer, actualCost) {
-        const {
-            referCut
-        } = this
+    _sendCommissionTo(referer: string, actualCost: BigNumber) {
+        const { referCut } = this
         if (referer !== "") {
             const withoutCut = new BigNumber(100).dividedToIntegerBy(referCut)
             const cut = actualCost.dividedToIntegerBy(withoutCut)
@@ -120,7 +119,7 @@ class DiceContract extends OwnerableContract {
         }
     }
 
-    _emitEvent(name, data) {
+    _emitEvent(name: string, data: Object) {
         Event.Trigger("Dice", { type: name, data });
     }
 
