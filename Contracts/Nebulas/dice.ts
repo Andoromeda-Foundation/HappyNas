@@ -23,9 +23,11 @@ const BigNumberStorageDescriptor = {
 class OwnerableContract {
     admins: StorageMap
     owner: string
+    myAddress: string
     constructor() {
         LocalContractStorage.defineProperties(this, {
-            owner: null
+            owner: null,
+            myAddress: null
         })
         LocalContractStorage.defineMapProperties(this, {
             "admins": null
@@ -71,6 +73,12 @@ class OwnerableContract {
         this.admins.set(address, "true")
     }
 
+    setMyAddress() {
+        this.onlyContractOwner()
+        const { to } = Blockchain.transaction
+        this.myAddress = to
+    }
+
     withdraw(value) {
         // Admins can ONLY REQUEST, Owner will GOT THE MONEY ANYWAY
         this.onlyAdmins()
@@ -79,7 +87,8 @@ class OwnerableContract {
     }
 
     getBalance() {
-        var balance = new BigNumber(Blockchain.getAccountState(this.myAddress).balance);
+        const state = Blockchain.getAccountState(this.myAddress)
+        var balance = new BigNumber(state.balance);
         return balance
     }
 
