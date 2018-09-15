@@ -83,10 +83,26 @@ class OwnerableContract {
         this.onlyContractOwner()
         this.admins.set(address, "true")
     }
+
+    withdraw(value) {
+        // Admins can ONLY REQUEST, Owner will GOT THE MONEY ANYWAY
+        this.onlyAdmins()
+        // Only the owner can have the withdrawed fund, so be careful
+        return Blockchain.transfer(this.owner, new BigNumber(value))
+    }
+
+    getBalance() {
+        var balance = new BigNumber(Blockchain.getAccountState(this.myAddress).balance);
+        return balance
+    }
+
+    withdrawAll() {
+        this.withdraw(this.getBalance())
+    }
 }
 
 class DiceContract extends OwnerableContract {
-    constructor() {       
+    constructor() {
         super()
         LocalContractStorage.defineProperties(this, {
             referCut: null,
@@ -106,11 +122,11 @@ class DiceContract extends OwnerableContract {
         }
     }
 
-    _event(name,indexes){
+    _event(name, indexes) {
         var k = {};
         k[name] = indexes;
         Event.Trigger("Dice", k);
-    }    
+    }
 
     // referer by default is empty
     bet(referer = "", bet_number = 50, is_under = true) {
@@ -118,31 +134,23 @@ class DiceContract extends OwnerableContract {
             from,
             value
         } = Blockchain.transaction
-        
+
         this._sendCommissionTo(referer, value)
 
-        var roll_number = Math.floor(Math.random() * 100);        
+        var roll_number = Math.floor(Math.random() * 100);
         if (is_under) {
             if (bet_number < roll_number) {
                 Blockchain.transfer(from, new BigNumber(value).times(96).dividedToIntegerBy(bet_number))
             }
         } else {
-            if(bet_number > roll_number) {
-                Blockchain.transfer(from,  new BigNumber(value).times(96).dividedToIntegerBy(99 - bet_number))
+            if (bet_number > roll_number) {
+                Blockchain.transfer(from, new BigNumber(value).times(96).dividedToIntegerBy(99 - bet_number))
             }
         }
-        this._event("Bet",{number: roll_number});
+        this._event("Bet", { number: roll_number });
     }
 
-    withdraw(value) {
-        this.onlyAdmins()
-        // Only the owner can have the withdraw fund, so be careful
-        return Blockchain.transfer(this.owner, new BigNumber(value))
-    }
 
-    withdrawAll() {
-        this.withdraw(this.getBalance())
-    }    
 
     init() {
         super.init()
