@@ -7,6 +7,14 @@
 
 "use strict"
 
+const BigNumberStorageDescriptor = {
+    parse(value) {
+        return new BigNumber(value);
+    },
+    stringify(o) {
+        return o.toString(10);
+    }
+}
 class Operator {
     constructor(obj) {
         this.operator = {}
@@ -105,7 +113,7 @@ class DiceContract extends OwnerableContract {
     constructor() {
         super()
         LocalContractStorage.defineProperties(this, {
-            referCut: null,
+            referCut: BigNumberStorageDescriptor,
         })
         LocalContractStorage.defineMapProperties(this, {
         })
