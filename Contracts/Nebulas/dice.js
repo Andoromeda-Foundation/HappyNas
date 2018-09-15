@@ -1,6 +1,5 @@
 /**
  * Dice Nebulas Version
- * @author: MinakoKojima <lychees67@gmail.com>
  * @version: 1.0
  */
 
@@ -85,6 +84,7 @@ class DiceContract extends OwnerableContract {
     constructor() {
         super()
         LocalContractStorage.defineProperties(this, {
+            // So we can take `referCut` as BigNumber object already (No more string to BN conversion now)
             referCut: BigNumberStorageDescriptor,
         })
         LocalContractStorage.defineMapProperties(this, {
@@ -102,10 +102,8 @@ class DiceContract extends OwnerableContract {
         }
     }
 
-    _event(name, indexes) {
-        var k = {};
-        k[name] = indexes;
-        Event.Trigger("Dice", k);
+    _emitEvent(name, data) {
+        Event.Trigger("Dice", { type: name, data });
     }
 
     // referer by default is empty
@@ -133,7 +131,7 @@ class DiceContract extends OwnerableContract {
             Blockchain.transfer(from, payout)
         }
         const betInfo = { bet_number, roll_number, payout }
-        this._event("Bet", betInfo);
+        this._emitEvent("Bet", betInfo);
         return betInfo
     }
 
