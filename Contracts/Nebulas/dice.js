@@ -1,6 +1,5 @@
 /**
- * CryptoHero Contract Nebulas Version
- * ©️ Andoromeda Foundation All Right Reserved.
+ * Dice Nebulas Version
  * @author: MinakoKojima <lychees67@gmail.com>
  * @version: 1.0
  */
