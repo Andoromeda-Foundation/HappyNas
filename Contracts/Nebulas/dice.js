@@ -118,7 +118,7 @@ class DiceContract extends OwnerableContract {
         const roll_number = Math.floor(Math.random() * 100);
         var payout = new BigNumber(0);
 
-        if (is_under) {
+        if (!is_under) {
             if (bet_number < roll_number) {
                 payout = new BigNumber(value).times(96).dividedToIntegerBy(bet_number)
             }
