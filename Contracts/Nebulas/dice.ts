@@ -1,5 +1,5 @@
 import { BigNumber } from "./bignumber";
-import { LocalContractStorage, Blockchain, StorageMap } from "./System";
+import { LocalContractStorage, Blockchain, StorageMap, Event } from "./System";
 
 /**
  * Dice Nebulas TypeScript Version * 
@@ -119,7 +119,7 @@ class DiceContract extends OwnerableContract {
         }
     }
 
-    _emitEvent(name: string, data: Object) {
+    _emitEvent(name: string, data: object) {
         Event.Trigger("Dice", { type: name, data });
     }
 
